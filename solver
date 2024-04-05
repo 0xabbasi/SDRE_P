@@ -1,0 +1,29 @@
+
+import numpy as np
+from scipy.integrate import solve_ivp
+
+def sdre_equation(t, P, A, Q, R):
+    P = P.reshape((len(A), len(A)))
+    dP_dt = -(A.T @ P + P @ A - P @ B @ np.linalg.inv(R) @ B.T @ P + Q)
+    return dP_dt.flatten()
+
+# Define system matrices
+A = np.array([[0, 1], [0, 0]])
+B = np.array([[0], [1]])
+Q = np.array([[1, 0], [0, 1]])
+R = np.array([[1]])
+
+# Initial guess for P
+P0 = np.eye(2)
+
+# Time span for integration (not really needed for steady-state)
+t_span = (0, 10)
+
+# Solve SDRE equation
+solution = solve_ivp(sdre_equation, t_span, P0.flatten(), args=(A, Q, R))
+
+# Extract solution
+P_ss = solution.y[:, -1].reshape((len(A), len(A)))
+
+print("Steady-state solution P:")
+print(P_ss)
